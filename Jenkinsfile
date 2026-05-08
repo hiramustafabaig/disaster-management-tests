@@ -23,20 +23,21 @@ pipeline {
     }
 
     post {
-        always {
-            script {
+    always {
+        script {
 
-                // safer fallback approach for email
-                def email = "qasimalik@gmail.com"
+            def email = ""
 
-                try {
-                    email = sh(
-                        script: "git log -1 --pretty=format:%ae",
-                        returnStdout: true
-                    ).trim()
-                } catch (Exception e) {
-                    echo "Could not extract git email, using fallback"
-                }
+            try {
+                email = sh(
+                    script: "git log -1 --pretty=format:%ae",
+                    returnStdout: true
+                ).trim()
+            } catch (Exception e) {
+                echo "Could not extract git email"
+            }
+
+            if (email?.trim()) {
 
                 echo "Sending email to: ${email}"
 
@@ -60,9 +61,12 @@ Jenkins CI Pipeline
                     attachLog: true,
                     mimeType: 'text/plain'
                 )
-            }
 
-            echo "Pipeline finished"
+            } else {
+                echo "No valid email found. Skipping email notification."
+            }
         }
+
+        echo "Pipeline finished"
     }
 }
