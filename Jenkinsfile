@@ -23,28 +23,30 @@ pipeline {
     }
 
     post {
-    always {
-        script {
+        always {
 
-            def email = ""
+            script {
 
-            try {
-                email = sh(
-                    script: "git log -1 --pretty=format:%ae",
-                    returnStdout: true
-                ).trim()
-            } catch (Exception e) {
-                echo "Could not extract git email"
-            }
+                def email = ""
 
-            if (email?.trim()) {
+                try {
+                    email = sh(
+                        script: "git log -1 --pretty=format:%ae",
+                        returnStdout: true
+                    ).trim()
 
-                echo "Sending email to: ${email}"
+                } catch (Exception e) {
+                    echo "Could not extract git email"
+                }
 
-                emailext (
-                    to: email,
-                    subject: "Jenkins CI Results - Disaster Tests #${env.BUILD_NUMBER}",
-                    body: """
+                if (email?.trim()) {
+
+                    echo "Sending email to: ${email}"
+
+                    emailext(
+                        to: email,
+                        subject: "Jenkins CI Results - Disaster Tests #${env.BUILD_NUMBER}",
+                        body: """
 Hello,
 
 Pipeline has completed.
@@ -58,15 +60,16 @@ View details: ${env.BUILD_URL}
 Regards,
 Jenkins CI Pipeline
 """,
-                    attachLog: true,
-                    mimeType: 'text/plain'
-                )
+                        attachLog: true,
+                        mimeType: 'text/plain'
+                    )
 
-            } else {
-                echo "No valid email found. Skipping email notification."
+                } else {
+                    echo "No valid email found. Skipping email notification."
+                }
             }
-        }
 
-        echo "Pipeline finished"
+            echo "Pipeline finished"
+        }
     }
 }
