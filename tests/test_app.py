@@ -1,7 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
-BASE_URL = "http://13.51.240.6:3000"
+BASE_URL = "http://13.62.250.232:3000/"
 
 # -----------------------
 # DRIVER SETUP
